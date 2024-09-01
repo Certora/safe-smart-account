@@ -1,5 +1,5 @@
 // All rules of SafeToL2Setup without sanity check
-// https://prover.certora.com/output/80942/a9e5af4904e44469b444af673d6c269c?anonymousKey=9e332637f5c2c07cabb080f8043bfd99e33d7bbe
+// https://prover.certora.com/output/80942/0639d6b99acb41ea9939baad4781bfa1?anonymousKey=c279b3bd45442b66b5ecad7a017e5b4ad3be1e4e
 
 // All rules of SafeToL2Setup with sanity check
 // https://prover.certora.com/output/80942/3cbb0c40489045488279deda0cfa9a4a?anonymousKey=f7fd8636ff12c6d589a46ac56d312e394a382004

@@ -1,5 +1,5 @@
 // All rules of SafeToL2Migration without sanity check
-// https://prover.certora.com/output/80942/eed425ec3f20443587f0649bfbaf6bbf?anonymousKey=d30c9b2608857e318a0f41e1f94132381384fdf9
+// https://prover.certora.com/output/80942/0e6b9696724342b38f978129c826dd46?anonymousKey=fc6f2912ae59d097b105f8458fb7870f08694114
 
 // All rules of SafeToL2Migration with sanity check
 // https://prover.certora.com/output/80942/a95f00eed26c4aa89c3e24fc07c1c574?anonymousKey=a63ab3672b3ae8e42a5af1e6b1f36251227d9ce8
