@@ -1,6 +1,6 @@
 diff -druN Safe.sol Safe.sol
 --- Safe.sol	2024-11-13 17:12:21
-+++ Safe.sol	2024-11-28 18:57:34
++++ Safe.sol	2024-11-29 16:24:29
 @@ -75,22 +75,24 @@
           * so we create a Safe with 0 owners and threshold 1.
           * This is an unusable Safe, perfect for the singleton
@@ -57,14 +57,13 @@ diff -druN Safe.sol Safe.sol
              // Calculate the hash
 -            txHash := keccak256(add(ptr, 30), 66)
 +            // txHash := keccak256(add(ptr, 30), 66)
-+            // MUNGED
 +            txHash := keccak256(add(ptr, 0), 96) // new
          }
          /* solhint-enable no-inline-assembly */
      }
 diff -druN base/Executor.sol base/Executor.sol
 --- base/Executor.sol	2024-11-12 11:17:19
-+++ base/Executor.sol	2024-11-12 11:29:05
++++ base/Executor.sol	2024-11-29 16:24:29
 @@ -26,12 +26,8 @@
          uint256 txGas
      ) internal returns (bool success) {
@@ -82,7 +81,7 @@ diff -druN base/Executor.sol base/Executor.sol
              /// @solidity memory-safe-assembly
 diff -druN interfaces/ISafe.sol interfaces/ISafe.sol
 --- interfaces/ISafe.sol	2024-11-12 11:17:19
-+++ interfaces/ISafe.sol	2024-11-12 11:29:05
++++ interfaces/ISafe.sol	2024-11-29 16:24:29
 @@ -110,7 +110,7 @@
       */
      function domainSeparator() external view returns (bytes32);
