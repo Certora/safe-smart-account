@@ -1,0 +1,11 @@
+import "../problems.spec";
+import "../unresolved.spec";
+import "../optimizations.spec";
+
+methods {
+    function _.supportsInterface(bytes4) external => DISPATCHER(true); //ITransactionGuard
+    function _.checkModuleTransaction() external => DISPATCHER(true); //IModuleGuard
+    function _.checkAfterModuleExecution() external => DISPATCHER(true);
+}
+
+use builtin rule sanity filtered { f -> f.contract == currentContract }
