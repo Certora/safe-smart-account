@@ -10,6 +10,17 @@ methods {
     function _.checkSignatures(bytes32, bytes) external => DISPATCHER(true);
     function _.checkSignatures(bytes32, bytes, bytes) external => DISPATCHER(true);
     function _.isValidSignature(bytes32, bytes) external => DISPATCHER(true);
+
+    function SignatureDecoder.signatureSplit(bytes memory signatures, uint256 pos) internal returns (uint8,bytes32,bytes32) => signatureSplitGhost(signatures,pos);
+}
+
+
+persistent ghost mapping(bytes => mapping(uint256 => uint8)) mySigSplitV;
+persistent ghost mapping(bytes => mapping(uint256 => bytes32)) mySigSplitR;
+persistent ghost mapping(bytes => mapping(uint256 => bytes32)) mySigSplitS;
+
+function signatureSplitGhost(bytes signatures, uint256 pos) returns (uint8,bytes32,bytes32) {
+    return (mySigSplitV[signatures][pos], mySigSplitR[signatures][pos], mySigSplitS[signatures][pos]);
 }
 
 use builtin rule sanity filtered { f -> f.contract == currentContract }
