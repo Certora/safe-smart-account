@@ -47,6 +47,7 @@ rule ownerRemoved(address prevOwner, address owner, uint256 _threshold) {
 rule ownerAdded(address owner, uint256 _threshold) {
     env e;
     // requireInvariant ownerNeverZero();
+    requireInvariant ownerConsistency();
     addOwnerWithThreshold(e,owner,_threshold);
     assert isOwner(owner);
 }
