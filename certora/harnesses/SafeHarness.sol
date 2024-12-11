@@ -40,6 +40,10 @@ contract SafeHarness is Safe {
         return getGuard();
     }
 
+    function getModuleGuardExternal() public view returns (address) {
+        return getModuleGuard();
+    }
+
     function getNativeTokenBalance() public view returns (uint256) {
         return address(this).balance;
     }
@@ -54,6 +58,10 @@ contract SafeHarness is Safe {
 
     function getOwnersCountFromArray() public view returns (uint256) {
         return getOwners().length;
+    }
+
+    function getNonce() public view returns (uint256) {
+        return nonce;
     }
 
     function getTransactionHashPublic(
