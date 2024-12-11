@@ -37,7 +37,8 @@ contract TxnGuardMock is ITransactionGuard {
         bytes memory signatures,
         address msgSender
     ) external override {
-        
+        // reverts if `value` is odd, giving a pseudo-random success rate
+        require (value % 2 == 0);
     }
 
     /**

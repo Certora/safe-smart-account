@@ -26,6 +26,9 @@ contract ModuleGuardMock is IModuleGuard {
         Enum.Operation operation,
         address module
     ) external override returns (bytes32 moduleTxHash) {
+        // reverts if `value` is odd, giving a pseudo-random success rate
+        require (value % 2 == 0);
+        // if it passes, it returns a string of bytes
         return bytes32(0);
     }
 
