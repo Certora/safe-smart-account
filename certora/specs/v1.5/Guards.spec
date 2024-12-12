@@ -2,15 +2,62 @@
 
 using ModuleGuardMock as modGuardMock;
 using TxnGuardMock as txnGuardMock;
+using SafeHarness as safe;
 
 // ---- Methods block ----------------------------------------------------------
 methods {
-
     function getModuleGuardExternal() external returns (address) envfree;
     function getSafeGuard() external returns (address) envfree;
+    
+    function txnGuardMock.preCheckedTransactions() external returns (bool) envfree;
+    function txnGuardMock.postCheckedTransactions() external returns (bool) envfree;
+    function modGuardMock.preCheckedTransactions() external returns (bool) envfree;
+    function modGuardMock.postCheckedTransactions() external returns (bool) envfree;
 
-    // function _.checkModuleTransaction() external => DISPATCHER(true) ;
-    // function _.checkTransaction() external => DISPATCHER(true) ;
+    function _.checkModuleTransaction(
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation,
+        address module
+    ) external => DISPATCHER(true) ;
+
+    function _.checkAfterModuleExecution(bytes32 txHash, bool success) external
+        => DISPATCHER(true) ;
+
+    function _.checkTransaction(
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation,
+        uint256 safeTxGas,
+        uint256 baseGas,
+        uint256 gasPrice,
+        address gasToken,
+        address refundReceiver,
+        bytes signatures,
+        address msgSender
+    ) external => DISPATCHER(true) ;
+
+    function _.checkAfterExecution(bytes32 hash, bool success) external 
+        => DISPATCHER(true);
+
+    function Executor.execute(
+        address to,
+        uint256 value,
+        bytes memory data,
+        Enum.Operation operation,
+        uint256 txGas
+    ) internal returns (bool) => NONDET;
+
+    function SecuredTokenTransfer.transferToken(address token, address receiver, uint256 amount) internal returns (bool) => NONDET ;
+    function Safe.handlePayment(
+        uint256 gasUsed,
+        uint256 baseGas,
+        uint256 gasPrice,
+        address gasToken,
+        address refundReceiver
+    ) internal returns (uint256) => NONDET ;
 
 }
 
@@ -23,7 +70,7 @@ methods {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev the only method that can change the guard is setGuard
-/// @status Done: https://prover.certora.com/output/39601/ad60a9c202954b4283d79dd289b97528?anonymousKey=9b2a693359d9ed0ca6cc8aeefacec73bfa0fc82e
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule guardAddressChange(method f) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
          f.selector != sig:getStorageAt(uint256,uint256).selector
@@ -40,7 +87,7 @@ rule guardAddressChange(method f) filtered {
 }
 
 /// @dev the only method that can change the module guard is setModuleGuard
-/// @status Done: https://prover.certora.com/output/39601/b23bd2ee79df48129ddf6c0b8269e1a7?anonymousKey=126c42543f362c5724d530a6dd9e8521da5b0c02
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 
 rule moduleGuardAddressChange(method f) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
@@ -58,7 +105,7 @@ rule moduleGuardAddressChange(method f) filtered {
 }
 
 /// @dev set-get correspondence for (regular) guard
-/// @status Done: https://prover.certora.com/output/39601/b23bd2ee79df48129ddf6c0b8269e1a7?anonymousKey=126c42543f362c5724d530a6dd9e8521da5b0c02
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule setGetCorrespondenceGuard(address guard) {
     env e;
     setGuard(e,guard);
@@ -67,7 +114,7 @@ rule setGetCorrespondenceGuard(address guard) {
 }
 
 /// @dev set-get correspodnence for module guard
-/// @status Done: https://prover.certora.com/output/39601/b23bd2ee79df48129ddf6c0b8269e1a7?anonymousKey=126c42543f362c5724d530a6dd9e8521da5b0c02
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule setGetCorrespondenceModuleGuard(address guard) {
     env e;
     setModuleGuard(e,guard);
@@ -75,8 +122,8 @@ rule setGetCorrespondenceModuleGuard(address guard) {
     assert guard == gotGuard;
 }
 
-/// @dev the transaction guard works: if the transaction succeeds then the transaction guard succeeds
-/// @status working
+/// @dev the transaction guard gets called both pre- and post- any execTransaction
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule txnGuardCalled(
     address to,
     uint256 value,
@@ -90,33 +137,38 @@ rule txnGuardCalled(
     bytes signatures
 ) {
     env e;
+    // the txn guard is the mock
+    require (getSafeGuard() == txnGuardMock);
 
+    // execTxn passes
     execTransaction(e,to,value,data,operation,safeTxGas,baseGas,
         gasPrice,gasToken,refundReceiver,signatures);
-
-    address guard = getSafeGuard();
-    require (guard != 0); // there is a transaction guard
     
-    txnGuardMock.checkTransaction@withrevert(e,to,value,data,operation,safeTxGas,baseGas,
-        gasPrice,gasToken,refundReceiver,signatures,e.msg.sender);
-    assert !lastReverted; // the guard succeeded
+    // the pre- and post- module transaction guards were called
+    assert (
+        txnGuardMock.preCheckedTransactions() == true && 
+        txnGuardMock.postCheckedTransactions() == true
+    );
 }
 
-/// @dev the module guard works: if the transaction succeeds then the module guard succeeds
-/// @status working
+/// @dev the module guard gets called both pre- and post- any execTransactionFromModule
+/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule moduleGuardCalled(
         address to,
         uint256 value,
         bytes data,
         Enum.Operation operation) {
     env e;
+    // the module guard is the mock
+    require (getModuleGuardExternal() == modGuardMock);
     
+    modGuardMock.resetChecks(e); // reset the check triggers
     execTransactionFromModule(e,to,value,data,operation);
-    
-    address guard = getModuleGuardExternal();
-    require (guard != 0); // there is a module guard
 
-    modGuardMock.checkModuleTransaction@withrevert(e, to, value, data, operation, e.msg.sender);
-    assert !lastReverted; // the guard succeeded
+    // the pre- and post- module transaction guards were called
+    assert (
+        modGuardMock.preCheckedTransactions() == true && 
+        modGuardMock.postCheckedTransactions() == true
+    );
 }
 

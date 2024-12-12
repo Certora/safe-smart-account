@@ -9,6 +9,15 @@ contract TxnGuardMock is ITransactionGuard {
 
     constructor(){}
 
+    // some mock variables 
+    bool public preCheckedTransactions ;
+    bool public postCheckedTransactions ;
+
+    function resetChecks() external {
+        preCheckedTransactions = false ;
+        postCheckedTransactions = false ;
+    }
+
     /**
      * @notice Checks the transaction details.
      * @dev The function needs to implement transaction validation logic.
@@ -37,8 +46,8 @@ contract TxnGuardMock is ITransactionGuard {
         bytes memory signatures,
         address msgSender
     ) external override {
-        // reverts if `value` is odd, giving a pseudo-random success rate
-        require (value % 2 == 0);
+        // updates transaction checked
+        preCheckedTransactions = true;
     }
 
     /**
@@ -48,7 +57,8 @@ contract TxnGuardMock is ITransactionGuard {
      * @param success The status of the transaction execution.
      */
     function checkAfterExecution(bytes32 hash, bool success) external override {
-        
+        // updates transaction checked
+        postCheckedTransactions = true ;
     }
 
     /**

@@ -7,7 +7,19 @@ import "../munged/libraries/Enum.sol";
 
 contract ModuleGuardMock is IModuleGuard {
 
-    constructor(){}
+    constructor(){
+        preCheckedTransactions = false ;
+        postCheckedTransactions = false ;
+    }
+
+    // some mock variables 
+    bool public preCheckedTransactions ;
+    bool public postCheckedTransactions ;
+
+    function resetChecks() external {
+        preCheckedTransactions = false ;
+        postCheckedTransactions = false ;
+    }
 
     /**
      * @notice Checks the module transaction details.
@@ -26,8 +38,8 @@ contract ModuleGuardMock is IModuleGuard {
         Enum.Operation operation,
         address module
     ) external override returns (bytes32 moduleTxHash) {
-        // reverts if `value` is odd, giving a pseudo-random success rate
-        require (value % 2 == 0);
+        // updates transaction checked
+        preCheckedTransactions = true ;
         // if it passes, it returns a string of bytes
         return bytes32(0);
     }
@@ -39,7 +51,7 @@ contract ModuleGuardMock is IModuleGuard {
      * @param success The status of the module transaction execution.
      */
     function checkAfterModuleExecution(bytes32 txHash, bool success) external override {
-        
+        postCheckedTransactions = true;
     }
 
     /**
