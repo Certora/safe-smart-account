@@ -122,6 +122,23 @@ rule setGetCorrespondenceModuleGuard(address guard) {
     assert guard == gotGuard;
 }
 
+/// @dev setGuard can only be called by contract itself.
+/// @status Done: https://prover.certora.com/output/39601/b78bb57e77e444ad9d89861a8dc66e9f?anonymousKey=b6452b2c9f788d4a4dcd8d3c41f16a3e66e64a66
+rule setGuardReentrant(address guard) {
+    env e;
+    setGuard(e,guard); // a successful call to setGuard
+    assert (e.msg.sender == safe);
+}
+
+/// @dev setModuleGuard can only be called by contract itself.
+/// @status Done: https://prover.certora.com/output/39601/8147e74eda404e61bcb6fc8e8849c5f3?anonymousKey=5c1e77468b6f5bff22c376894dca846f5ea83aab
+rule setModuleGuardReentrant(address guard) {
+    env e;
+    setModuleGuard(e,guard);
+    assert(e.msg.sender == safe);
+}
+
+
 /// @dev the transaction guard gets called both pre- and post- any execTransaction
 /// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule txnGuardCalled(
