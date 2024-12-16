@@ -77,6 +77,23 @@ rule execTxnModulePermissions(
     assert (module_enabled);
 }
 
+/// @dev a successful call to execTransactionFromModuleReturnData must be from enabled module
+/// @status Done: https://prover.certora.com/output/39601/49c3745804084c5aa7284792f805316b?anonymousKey=356721ccd4d2592e83a5fbf1ee58ed278e8dd9ff
+rule execTxnModuleReturnDataPermissions(
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation) {
+    env e;
+    bool module_enabled = isModuleEnabled(e,e.msg.sender) ;
+
+    // execTxn from module passes
+    execTransactionFromModuleReturnData(e,to,value,data,operation);
+    
+    // msg sender is the module
+    assert (module_enabled);
+}
+
 
 /// @dev execute can only be called by execTransaction or execTransactionFromModule 
 /// @status Done: https://prover.certora.com/output/39601/9b60b63b5aa84428b9fca530f870c4b6?anonymousKey=4b731a650337bea416faf81e806d96a7b040f8e8

@@ -189,3 +189,24 @@ rule moduleGuardCalled(
     );
 }
 
+/// @dev the module guard gets called both pre- and post- any execTransactionFromModuleReturnData
+/// @status Done: https://prover.certora.com/output/39601/15cfd3430d794986a26d304c9e2fbc6e?anonymousKey=92f0976aba6cb3fe40cf6c728d34b140a438bbae
+rule moduleGuardCalledReturn(
+        address to,
+        uint256 value,
+        bytes data,
+        Enum.Operation operation) {
+    env e;
+    // the module guard is the mock
+    require (getModuleGuardExternal() == modGuardMock);
+    
+    modGuardMock.resetChecks(e); // reset the check triggers
+    execTransactionFromModuleReturnData(e,to,value,data,operation);
+
+    // the pre- and post- module transaction guards were called
+    assert (
+        modGuardMock.preCheckedTransactions() && 
+        modGuardMock.postCheckedTransactions()
+    );
+}
+
