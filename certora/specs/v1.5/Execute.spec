@@ -68,12 +68,13 @@ rule execTxnModulePermissions(
         bytes data,
         Enum.Operation operation) {
     env e;
+    bool module_enabled = isModuleEnabled(e,e.msg.sender) ;
 
     // execTxn from module passes
     execTransactionFromModule(e,to,value,data,operation);
     
     // msg sender is the module
-    assert (isModuleEnabled(e,e.msg.sender));
+    assert (module_enabled);
 }
 
 
@@ -144,5 +145,6 @@ rule executeThresholdMet(
     execTransaction(e,to,value,data,operation,safeTxGas,baseGas,
         gasPrice,gasToken,refundReceiver,signatures);
     
+    // an added function to the harness SafeHarness.sol that checks signature numbers
     assert (numSigsSufficient(signatures,threshold));
 }
