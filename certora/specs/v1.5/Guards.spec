@@ -163,8 +163,8 @@ rule txnGuardCalled(
     
     // the pre- and post- module transaction guards were called
     assert (
-        txnGuardMock.preCheckedTransactions() == true && 
-        txnGuardMock.postCheckedTransactions() == true
+        txnGuardMock.preCheckedTransactions() && 
+        txnGuardMock.postCheckedTransactions()
     );
 }
 
@@ -184,8 +184,8 @@ rule moduleGuardCalled(
 
     // the pre- and post- module transaction guards were called
     assert (
-        modGuardMock.preCheckedTransactions() == true && 
-        modGuardMock.postCheckedTransactions() == true
+        modGuardMock.preCheckedTransactions() && 
+        modGuardMock.postCheckedTransactions()
     );
 }
 
