@@ -35,7 +35,7 @@ methods {
         bytes memory data,
         Enum.Operation operation,
         uint256 txGas
-    ) internal returns (bool) => NONDET;
+    ) internal returns (bool) => execute_summary();
 
     function SecuredTokenTransfer.transferToken(address token, address receiver, uint256 amount) internal returns (bool) => NONDET ;
     function Safe.handlePayment(
@@ -50,6 +50,13 @@ methods {
 
 // ---- Functions and ghosts ---------------------------------------------------
 
+persistent ghost bool execute_called { init_state axiom execute_called == false; }
+
+function execute_summary() returns bool {
+    execute_called = true ;
+    
+    return true ;
+}
 
 // ---- Invariants -------------------------------------------------------------
 
@@ -70,6 +77,52 @@ rule execTxnModulePermissions(
     
     // msg sender is the module
     assert (isModuleEnabled(e,e.msg.sender));
+}
+
+
+/// @dev execute can only be called by execTransaction or execTransactionFromModule 
+/// @status Done: https://prover.certora.com/output/39601/9b60b63b5aa84428b9fca530f870c4b6?anonymousKey=4b731a650337bea416faf81e806d96a7b040f8e8
+rule executePermissions(method f) filtered {
+    f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
+         f.selector != sig:getStorageAt(uint256,uint256).selector
+} {
+    env e;
+    require (execute_called == false);
+
+    calldataarg args;
+    f(e, args);
+
+    assert (execute_called => 
+        f.selector == sig:execTransaction(
+                            address,
+                            uint256,
+                            bytes,
+                            Enum.Operation,
+                            uint256,
+                            uint256,
+                            uint256,
+                            address,
+                            address,
+                            bytes).selector ||
+        f.selector == sig:execTransactionFromModule(
+                            address,
+                            uint256,
+                            bytes,
+                            Enum.Operation).selector) ||
+        f.selector == sig:execTransactionFromModuleReturnData(
+                            address,
+                            uint256,
+                            bytes,
+                            Enum.Operation).selector || 
+        f.selector == sig:setup(
+                            address[],
+                            uint256,
+                            address,
+                            bytes,
+                            address,
+                            address,
+                            uint256,
+                            address).selector;
 }
 
 
