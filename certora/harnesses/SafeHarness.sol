@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 import "../munged/Safe.sol";
 import {SafeMath} from "../munged/external/SafeMath.sol";
+import {ISafe, IStaticFallbackMethod, IFallbackMethod, ExtensibleBase} from "../munged/handler/extensible/ExtensibleBase.sol";
 
 contract SafeHarness is Safe {
     constructor(
@@ -63,6 +64,19 @@ contract SafeHarness is Safe {
 
     function getOwnersCountFromArray() public view returns (uint256) {
         return getOwners().length;
+    }
+
+    function getFallbackHandler() public view returns (address) {
+        address handler;
+        assembly{
+            handler := sload(FALLBACK_HANDLER_STORAGE_SLOT)
+        }
+        return handler ;
+    }
+
+    // TODO deprecate this with CVL2
+    function addressToBytes32(address addr) public pure returns (bytes32) {
+        return bytes32(uint256(uint160(addr)));
     }
 
     function getTransactionHashPublic(
