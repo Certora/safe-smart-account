@@ -74,11 +74,6 @@ contract SafeHarness is Safe {
         return handler ;
     }
 
-    // TODO deprecate this with CVL2
-    function addressToBytes32(address addr) public pure returns (bytes32) {
-        return bytes32(uint256(uint160(addr)));
-    }
-
     function getTransactionHashPublic(
         address to,
         uint256 value,
