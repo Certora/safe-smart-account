@@ -102,7 +102,7 @@ rule executePermissions(method f) filtered {
          f.selector != sig:getStorageAt(uint256,uint256).selector
 } {
     env e;
-    require (execute_called == false);
+    require !execute_called;
 
     calldataarg args;
     f(e, args);
