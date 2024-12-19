@@ -16,30 +16,32 @@ methods {
 
 // ---- Rules ------------------------------------------------------------------
 
-/// @dev setup can only be called if threshold = 0 and setup sets threshold > 0 
-/// @status Done: https://prover.certora.com/output/39601/7849e9a464e042ea89bfe68fc226edbc?anonymousKey=5c1387afecb8bc86f23df3be5eb886a5cd82787f
+/// @dev approvedHashes[user][hash] can only be changed by msg.sender==user
+/// @status Done: https://prover.certora.com/output/39601/bb515eafa67e4edd99bb5aa51a63877b?anonymousKey=9c42e3105c1c3a3fbc95c8a24fa43b3dd43a05d6 
 
-rule setupThresholdZeroAndSetsPositiveThreshold(
-        address[] _owners,
-        uint256 _threshold,
-        address to,
-        bytes data,
-        address fallbackHandler,
-        address paymentToken,
-        uint256 payment,
-        address paymentReceiver) {
+rule approvedHashesUpdate(method f,bytes32 userHash,address user) filtered {
+    f -> f.selector != sig:simulateAndRevert(address,bytes).selector
+} {
     env e;
 
-    uint256 old_threshold = getThreshold();
+    uint256 hashBefore = approvedHashVal(e,user,userHash);
 
-    // a successful call to setup
-    setup(e,_owners,_threshold,to,data,fallbackHandler,
-        paymentToken,payment,paymentReceiver);
+    calldataarg args;
+    f(e,args);
 
-    uint256 new_threshold = getThreshold();
+    uint256 hashAfter = approvedHashVal(e,user,userHash);
 
-    assert (
-        new_threshold >  0 &&
-        old_threshold == 0
+    assert (hashBefore != hashAfter =>
+        (e.msg.sender == user)
     );
+}
+
+
+/// @dev approvedHashes is set when calling approveHash
+/// @status Done: https://prover.certora.com/output/39601/bb515eafa67e4edd99bb5aa51a63877b?anonymousKey=9c42e3105c1c3a3fbc95c8a24fa43b3dd43a05d6
+
+rule approvedHashesSet(bytes32 hashToApprove) {
+    env e;
+    approveHash(e,hashToApprove);
+    assert(approvedHashVal(e,e.msg.sender,hashToApprove) == 1);
 }
