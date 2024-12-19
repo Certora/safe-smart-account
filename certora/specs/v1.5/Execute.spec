@@ -50,9 +50,9 @@ methods {
 persistent ghost bool execute_called { init_state axiom execute_called == false; }
 
 function execute_summary() returns bool {
-    execute_called = true ;
-    
-    return true ;
+    execute_called = true ;    
+    bool new_var ;
+    return new_var ;
 }
 
 // ---- Invariants -------------------------------------------------------------
