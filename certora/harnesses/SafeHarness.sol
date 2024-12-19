@@ -2,6 +2,8 @@
 import "../munged/Safe.sol";
 import {SafeMath} from "../munged/external/SafeMath.sol";
 import {ISafe, IStaticFallbackMethod, IFallbackMethod, ExtensibleBase} from "../munged/handler/extensible/ExtensibleBase.sol";
+import {IFallbackHandler, FallbackHandler} from "../munged/handler/extensible/FallbackHandler.sol";
+
 
 contract SafeHarness is Safe {
     constructor(
@@ -66,12 +68,24 @@ contract SafeHarness is Safe {
         return getOwners().length;
     }
 
+    function approvedHashVal(address a, bytes32 hashInQuestion) public view returns (uint256) {
+        return approvedHashes[a][hashInQuestion];
+    }
+
     function getFallbackHandler() public view returns (address) {
         address handler;
         assembly{
             handler := sload(FALLBACK_HANDLER_STORAGE_SLOT)
         }
         return handler ;
+    }
+
+    function callSetSafeMethod(bytes4 selector, bytes32 newMethod) public {
+        IFallbackHandler(address(this)).setSafeMethod(selector,newMethod);
+    }
+
+    function callDummyHandler(bytes4 selector) public {
+        address(this).call(abi.encodeWithSelector(selector));
     }
 
     function getTransactionHashPublic(
