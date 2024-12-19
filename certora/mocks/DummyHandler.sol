@@ -15,6 +15,10 @@ contract DummyHandler is IFallbackMethod {
     function handle(ISafe safe, address sender, uint256 value, bytes calldata data) external override returns (bytes memory result) {
         methodCalled = true ;
         
-        return "Hello, world!"; // TODO
+        return "Hello, world!";
+    }
+
+    function dummyMethod() public {
+        methodCalled = true ;
     }
 }
