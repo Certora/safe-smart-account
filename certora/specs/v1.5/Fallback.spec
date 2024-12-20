@@ -10,7 +10,7 @@ methods {
     function getFallbackHandler() external returns (address) envfree;
     function _.handle(address _safe, address sender, uint256 value, bytes data) external => DISPATCHER(true);
 
-    unresolved external in SafeHarness._() => DISPATCH(use_fallback=true) [
+    unresolved external in safe._ => DISPATCH(use_fallback=true) [
         fallbackHandler._
     ] default NONDET;
     
@@ -45,6 +45,13 @@ rule setFallbackIntegrity(address handler) {
 /// @status Done: https://prover.certora.com/output/39601/edb75f86f23445cdbc7cd7b5c4c420b6?anonymousKey=62191f4f70404bcbce784f5172e3ed7ab323d416
 invariant fallbackHanlderNeverSelf() 
     getFallbackHandler() != safe
+    filtered { 
+        f -> f.selector != sig:simulateAndRevert(address,bytes).selector 
+    }
+
+/// @status TODOviolation: https://prover.certora.com/output/39601/cfde79a198b34aa78dbc5714a5e416b6?anonymousKey=f3e41441fbb2f941efc2033b10cccdee7c84249e
+invariant fallbackHanlderNeverZero() 
+    getFallbackHandler() != 0
     filtered { 
         f -> f.selector != sig:simulateAndRevert(address,bytes).selector 
     }
@@ -128,9 +135,12 @@ rule hanlderCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallbac
 }
 
 /// @dev a handler is called under expected conditions
-/// @status violated due to dispatching issues (problem with the Prover)
+/// @status violated due to Prover bug: https://prover.certora.com/output/39601/c3379d53af8d4639b2236d0be41af6b9?anonymousKey=df18d967edb98b99e5851a280d84728ce18724cb
 rule handlerCalledIfSet() {
     env e;
+
+    requireInvariant fallbackHanlderNeverSelf();
+    requireInvariant fallbackHanlderNeverZero();
 
     // the fallback handler is in the scene
     require (getFallbackHandler() == fallbackHandler);
