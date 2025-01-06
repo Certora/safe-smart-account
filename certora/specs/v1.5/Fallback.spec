@@ -43,20 +43,13 @@ rule setFallbackIntegrity(address handler) {
 
 /// @dev invariant: the address in fallback handler slot is never self
 /// @status Done: https://prover.certora.com/output/39601/edb75f86f23445cdbc7cd7b5c4c420b6?anonymousKey=62191f4f70404bcbce784f5172e3ed7ab323d416
-invariant fallbackHanlderNeverSelf() 
+invariant fallbackHandlerNeverSelf() 
     getFallbackHandler() != safe
     filtered { 
         f -> f.selector != sig:simulateAndRevert(address,bytes).selector 
     }
 
-/// @status TODOviolation: https://prover.certora.com/output/39601/cfde79a198b34aa78dbc5714a5e416b6?anonymousKey=f3e41441fbb2f941efc2033b10cccdee7c84249e
-invariant fallbackHanlderNeverZero() 
-    getFallbackHandler() != 0
-    filtered { 
-        f -> f.selector != sig:simulateAndRevert(address,bytes).selector 
-    }
-
-/// @dev for soundness of fallbackHanlderNeverSelf, we prove a rule that simulateAndRevert always reverts
+/// @dev for soundness of fallbackHandlerNeverSelf, we prove a rule that simulateAndRevert always reverts
 /// @status Done: https://prover.certora.com/output/39601/38653935d0db460994d1a8c5bfdf57bb?anonymousKey=988218ca4f784fd27ea96fd2f14644719e2e9468
 rule simulateAndRevertReverts(address caddr, bytes b) {
     env e;
@@ -113,7 +106,7 @@ rule setSafeMethodChanges(bytes4 selector, address newMethodCaddr) {
 
 /// @dev a handler, once set via setSafeMethod, is possible to call
 /// @status Done: https://prover.certora.com/output/39601/9fcde04ecd434963b9ce788f7ddea8c1?anonymousKey=a7efde58b28ef7c99264424b66984a8d39b78518
-rule hanlderCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallback } {
+rule handlerCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallback } {
     env e;
 
     // the fallback handler is in the scene
@@ -135,12 +128,9 @@ rule hanlderCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallbac
 }
 
 /// @dev a handler is called under expected conditions
-/// @status violated due to Prover bug: https://prover.certora.com/output/39601/c3379d53af8d4639b2236d0be41af6b9?anonymousKey=df18d967edb98b99e5851a280d84728ce18724cb
+/// @status Done: https://prover.certora.com/output/39601/a5bab5a7af8b4fd2819dedbc6e3221b9?anonymousKey=e4505515d8d69b3b1697c97fc3cc8f994802e46d
 rule handlerCalledIfSet() {
     env e;
-
-    requireInvariant fallbackHanlderNeverSelf();
-    requireInvariant fallbackHanlderNeverZero();
 
     // the fallback handler is in the scene
     require (getFallbackHandler() == fallbackHandler);
