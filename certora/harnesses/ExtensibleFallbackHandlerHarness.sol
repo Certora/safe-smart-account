@@ -8,8 +8,4 @@ contract ExtensibleFallbackHandlerHarness is ExtensibleFallbackHandler {
         return safeMethods[safe][selector];
     }
 
-    function getContextAndHandler() external view returns (ISafe safe, address sender, bool isStatic, address handler) {
-        _getContextAndHandler();
-    }
-
 }
