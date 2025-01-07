@@ -7,8 +7,6 @@ methods {
     // envfree
     function numSigsSufficient(bytes signatures,uint256 requiredSignatures) external returns (bool) envfree;
 
-    // function _.isValidSignature(bytes32 _hash, bytes _signature) external => DISPATCHER(true);
-
     function _.checkTransaction(
         address to,
         uint256 value,
