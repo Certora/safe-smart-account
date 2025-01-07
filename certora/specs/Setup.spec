@@ -17,8 +17,6 @@ methods {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev setup can only be called if threshold = 0 and setup sets threshold > 0 
-/// @status Done: https://prover.certora.com/output/39601/7849e9a464e042ea89bfe68fc226edbc?anonymousKey=5c1387afecb8bc86f23df3be5eb886a5cd82787f
-
 rule setupThresholdZeroAndSetsPositiveThreshold(
         address[] _owners,
         uint256 _threshold,

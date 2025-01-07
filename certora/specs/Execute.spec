@@ -61,7 +61,6 @@ function execute_summary() returns bool {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev a successful call to execTransactionFromModule must be from enabled module
-/// @status Done: https://prover.certora.com/output/39601/dcc09acbeead4df9868519a4ac0e3ee5?anonymousKey=327efa3ac9dde7907db389b3a2688ce42094ef41
 rule execTxnModulePermissions(
         address to,
         uint256 value,
@@ -78,7 +77,6 @@ rule execTxnModulePermissions(
 }
 
 /// @dev a successful call to execTransactionFromModuleReturnData must be from enabled module
-/// @status Done: https://prover.certora.com/output/39601/49c3745804084c5aa7284792f805316b?anonymousKey=356721ccd4d2592e83a5fbf1ee58ed278e8dd9ff
 rule execTxnModuleReturnDataPermissions(
         address to,
         uint256 value,
@@ -96,7 +94,6 @@ rule execTxnModuleReturnDataPermissions(
 
 
 /// @dev execute can only be called by execTransaction or execTransactionFromModule 
-/// @status Done: https://prover.certora.com/output/39601/9b60b63b5aa84428b9fca530f870c4b6?anonymousKey=4b731a650337bea416faf81e806d96a7b040f8e8
 rule executePermissions(method f) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
          f.selector != sig:getStorageAt(uint256,uint256).selector
@@ -142,7 +139,6 @@ rule executePermissions(method f) filtered {
 
 
 /// @dev at least "threshold" signatures provided
-/// @status Done: https://prover.certora.com/output/39601/9f364fac5e8c43e0acc2d93cea3f5560?anonymousKey=d37fb383bff8fa2fe0dacf60b61130e1aadf2ad4
 rule executeThresholdMet(
         address to,
         uint256 value,

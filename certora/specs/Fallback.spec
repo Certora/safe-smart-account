@@ -31,7 +31,6 @@ methods {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev fallback handler gets set by setFallbackHandler
-/// @status Done: https://prover.certora.com/output/39601/ab995049df0b454b888f3cd6a27331d5?anonymousKey=1a710fa917c8c60a9a420e026d6570d91e1e923b
 rule setFallbackIntegrity(address handler) {
     env e;
 
@@ -42,7 +41,6 @@ rule setFallbackIntegrity(address handler) {
 }
 
 /// @dev invariant: the address in fallback handler slot is never self
-/// @status Done: https://prover.certora.com/output/39601/edb75f86f23445cdbc7cd7b5c4c420b6?anonymousKey=62191f4f70404bcbce784f5172e3ed7ab323d416
 invariant fallbackHandlerNeverSelf() 
     getFallbackHandler() != safe
     filtered { 
@@ -50,7 +48,6 @@ invariant fallbackHandlerNeverSelf()
     }
 
 /// @dev for soundness of fallbackHandlerNeverSelf, we prove a rule that simulateAndRevert always reverts
-/// @status Done: https://prover.certora.com/output/39601/38653935d0db460994d1a8c5bfdf57bb?anonymousKey=988218ca4f784fd27ea96fd2f14644719e2e9468
 rule simulateAndRevertReverts(address caddr, bytes b) {
     env e;
     simulateAndRevert@withrevert(e,caddr,b);
@@ -58,7 +55,6 @@ rule simulateAndRevertReverts(address caddr, bytes b) {
 }
 
 /// @dev setSafeMethod sets the handler
-/// @status Done: https://prover.certora.com/output/39601/bab9860cdfc44a83bed82e79d8c06218?anonymousKey=b4c5dbef050bb201ad78b3dd5af5cdca8ffa9f92
 rule setSafeMethodSets(bytes4 selector, address newMethodCaddr) {
     env e;
 
@@ -72,8 +68,6 @@ rule setSafeMethodSets(bytes4 selector, address newMethodCaddr) {
 }
 
 /// @dev setSafeMethod removes the handler
-/// @status Done: https://prover.certora.com/output/39601/8591535c4a434f3e826af00b95ea1ca8?anonymousKey=a7b6743a3161a3289883f99014619a9d6e7196e1
-/// note this is a special case of the rule above, but we still include it here for illustration
 rule setSafeMethodRemoves(bytes4 selector) {
     env e; 
 
@@ -87,7 +81,6 @@ rule setSafeMethodRemoves(bytes4 selector) {
 }
 
 /// @dev setSafeMethod changes the handler
-/// @status Done: https://prover.certora.com/output/39601/b44efe9ef3bd4ff5a1af710a7d3d7ee4?anonymousKey=7fd15cc355164c803123c27b41660fed34548647 
 rule setSafeMethodChanges(bytes4 selector, address newMethodCaddr) {
     env e; 
 
@@ -105,7 +98,6 @@ rule setSafeMethodChanges(bytes4 selector, address newMethodCaddr) {
 
 
 /// @dev a handler, once set via setSafeMethod, is possible to call
-/// @status Done: https://prover.certora.com/output/39601/9fcde04ecd434963b9ce788f7ddea8c1?anonymousKey=a7efde58b28ef7c99264424b66984a8d39b78518
 rule handlerCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallback } {
     env e;
 
@@ -128,7 +120,6 @@ rule handlerCallableIfSet(method f, bytes4 selector) filtered { f -> f.isFallbac
 }
 
 /// @dev a handler is called under expected conditions
-/// @status Done: https://prover.certora.com/output/39601/a5bab5a7af8b4fd2819dedbc6e3221b9?anonymousKey=e4505515d8d69b3b1697c97fc3cc8f994802e46d
 rule handlerCalledIfSet() {
     env e;
 

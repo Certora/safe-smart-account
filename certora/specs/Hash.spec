@@ -17,8 +17,6 @@ methods {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev approvedHashes[user][hash] can only be changed by msg.sender==user
-/// @status Done: https://prover.certora.com/output/39601/bb515eafa67e4edd99bb5aa51a63877b?anonymousKey=9c42e3105c1c3a3fbc95c8a24fa43b3dd43a05d6 
-
 rule approvedHashesUpdate(method f,bytes32 userHash,address user) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector
 } {
@@ -38,8 +36,6 @@ rule approvedHashesUpdate(method f,bytes32 userHash,address user) filtered {
 
 
 /// @dev approvedHashes is set when calling approveHash
-/// @status Done: https://prover.certora.com/output/39601/bb515eafa67e4edd99bb5aa51a63877b?anonymousKey=9c42e3105c1c3a3fbc95c8a24fa43b3dd43a05d6
-
 rule approvedHashesSet(bytes32 hashToApprove) {
     env e;
     approveHash(e,hashToApprove);

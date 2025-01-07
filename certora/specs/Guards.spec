@@ -72,7 +72,6 @@ methods {
 // ---- Rules ------------------------------------------------------------------
 
 /// @dev the only method that can change the guard is setGuard
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule guardAddressChange(method f) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
          f.selector != sig:getStorageAt(uint256,uint256).selector
@@ -89,8 +88,6 @@ rule guardAddressChange(method f) filtered {
 }
 
 /// @dev the only method that can change the module guard is setModuleGuard
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
-
 rule moduleGuardAddressChange(method f) filtered {
     f -> f.selector != sig:simulateAndRevert(address,bytes).selector &&
          f.selector != sig:getStorageAt(uint256,uint256).selector
@@ -107,7 +104,6 @@ rule moduleGuardAddressChange(method f) filtered {
 }
 
 /// @dev set-get correspondence for (regular) guard
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule setGetCorrespondenceGuard(address guard) {
     env e;
     setGuard(e,guard);
@@ -116,7 +112,6 @@ rule setGetCorrespondenceGuard(address guard) {
 }
 
 /// @dev set-get correspodnence for module guard
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
 rule setGetCorrespondenceModuleGuard(address guard) {
     env e;
     setModuleGuard(e,guard);
@@ -125,7 +120,6 @@ rule setGetCorrespondenceModuleGuard(address guard) {
 }
 
 /// @dev setGuard can only be called by contract itself.
-/// @status Done: https://prover.certora.com/output/39601/b78bb57e77e444ad9d89861a8dc66e9f?anonymousKey=b6452b2c9f788d4a4dcd8d3c41f16a3e66e64a66
 rule setGuardReentrant(address guard) {
     env e;
     setGuard(e,guard); // a successful call to setGuard
@@ -133,7 +127,6 @@ rule setGuardReentrant(address guard) {
 }
 
 /// @dev setModuleGuard can only be called by contract itself.
-/// @status Done: https://prover.certora.com/output/39601/8147e74eda404e61bcb6fc8e8849c5f3?anonymousKey=5c1e77468b6f5bff22c376894dca846f5ea83aab
 rule setModuleGuardReentrant(address guard) {
     env e;
     setModuleGuard(e,guard);
@@ -142,7 +135,6 @@ rule setModuleGuardReentrant(address guard) {
 
 
 /// @dev the transaction guard gets called both pre- and post- any execTransaction
-/// @status Done: https://prover.certora.com/output/39601/a9a8eaeba7994e10bf29dbe8813798b9?anonymousKey=fbddda2f78b44a7df3dff4707715b90b2d08ab63
 rule txnGuardCalled(
     address to,
     uint256 value,
@@ -176,7 +168,6 @@ rule txnGuardCalled(
 }
 
 /// @dev the module guard gets called both pre- and post- any execTransactionFromModule
-/// @status Done: https://prover.certora.com/output/39601/7591e8c61e6d407b847e38bbe8238e13?anonymousKey=5d99429f5046e77825a4ed015af0a6a0d088538d
 rule moduleGuardCalled(
         address to,
         uint256 value,
@@ -202,7 +193,6 @@ rule moduleGuardCalled(
 }
 
 /// @dev the module guard gets called both pre- and post- any execTransactionFromModuleReturnData
-/// @status Done: https://prover.certora.com/output/39601/2de5a471d628464e8aaf4b9022e515de?anonymousKey=c4997fd77ba3808cf9bdc6a432f9b20eea551c95
 rule moduleGuardCalledReturn(
         address to,
         uint256 value,
