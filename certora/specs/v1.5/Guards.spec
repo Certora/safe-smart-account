@@ -1,7 +1,9 @@
 /* A specification of the safe guard and module guard */
 
 using ModuleGuardMock as modGuardMock;
+using ModuleGuardMockDuplicate as modGuardMock2;
 using TxnGuardMock as txnGuardMock;
+using TxnGuardMockDuplicate as txnGuardMock2;
 using SafeHarness as safe;
 
 // ---- Methods block ----------------------------------------------------------
@@ -140,7 +142,7 @@ rule setModuleGuardReentrant(address guard) {
 
 
 /// @dev the transaction guard gets called both pre- and post- any execTransaction
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
+/// @status Done: https://prover.certora.com/output/39601/a9a8eaeba7994e10bf29dbe8813798b9?anonymousKey=fbddda2f78b44a7df3dff4707715b90b2d08ab63
 rule txnGuardCalled(
     address to,
     uint256 value,
@@ -157,19 +159,24 @@ rule txnGuardCalled(
     // the txn guard is the mock
     require (getSafeGuard() == txnGuardMock);
 
-    // execTxn passes
+    txnGuardMock.resetChecks(e); // reset the check triggers
+    txnGuardMock2.resetChecks(e);
+
     execTransaction(e,to,value,data,operation,safeTxGas,baseGas,
         gasPrice,gasToken,refundReceiver,signatures);
     
     // the pre- and post- module transaction guards were called
     assert (
         txnGuardMock.preCheckedTransactions() && 
-        txnGuardMock.postCheckedTransactions()
+        txnGuardMock.postCheckedTransactions() &&
+        // the right guard was called
+        !txnGuardMock2.preCheckedTransactions(e) && 
+        !txnGuardMock2.postCheckedTransactions(e)
     );
 }
 
 /// @dev the module guard gets called both pre- and post- any execTransactionFromModule
-/// @status Done: https://prover.certora.com/output/39601/a05e24787c68404d877ae4acce693734?anonymousKey=02030d2ca97a19d0d7a70deb5a91dc4b75bca89d
+/// @status Done: https://prover.certora.com/output/39601/7591e8c61e6d407b847e38bbe8238e13?anonymousKey=5d99429f5046e77825a4ed015af0a6a0d088538d
 rule moduleGuardCalled(
         address to,
         uint256 value,
@@ -180,17 +187,22 @@ rule moduleGuardCalled(
     require (getModuleGuardExternal() == modGuardMock);
     
     modGuardMock.resetChecks(e); // reset the check triggers
+    modGuardMock2.resetChecks(e);
+    
     execTransactionFromModule(e,to,value,data,operation);
 
     // the pre- and post- module transaction guards were called
     assert (
         modGuardMock.preCheckedTransactions() && 
-        modGuardMock.postCheckedTransactions()
+        modGuardMock.postCheckedTransactions() &&
+        // the correct guard was called
+        !modGuardMock2.preCheckedTransactions(e) && 
+        !modGuardMock2.postCheckedTransactions(e)
     );
 }
 
 /// @dev the module guard gets called both pre- and post- any execTransactionFromModuleReturnData
-/// @status Done: https://prover.certora.com/output/39601/15cfd3430d794986a26d304c9e2fbc6e?anonymousKey=92f0976aba6cb3fe40cf6c728d34b140a438bbae
+/// @status Done: https://prover.certora.com/output/39601/2de5a471d628464e8aaf4b9022e515de?anonymousKey=c4997fd77ba3808cf9bdc6a432f9b20eea551c95
 rule moduleGuardCalledReturn(
         address to,
         uint256 value,
@@ -201,12 +213,17 @@ rule moduleGuardCalledReturn(
     require (getModuleGuardExternal() == modGuardMock);
     
     modGuardMock.resetChecks(e); // reset the check triggers
+    modGuardMock2.resetChecks(e);
+
     execTransactionFromModuleReturnData(e,to,value,data,operation);
 
     // the pre- and post- module transaction guards were called
     assert (
         modGuardMock.preCheckedTransactions() && 
-        modGuardMock.postCheckedTransactions()
+        modGuardMock.postCheckedTransactions() &&
+        // the correct guard was called
+        !modGuardMock2.preCheckedTransactions(e) && 
+        !modGuardMock2.postCheckedTransactions(e)
     );
 }
 
